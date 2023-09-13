@@ -125,6 +125,8 @@ export class UserService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 }
