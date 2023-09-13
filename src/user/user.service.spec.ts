@@ -5,6 +5,8 @@ import { createConnection } from 'mysql2';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.dto';
+import { EditUserInput } from './dto/edit-user.dto';
+import { DeleteUserInput } from './dto/delete-user.dto';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -144,6 +146,84 @@ describe('UserService', () => {
     it('유저가 존재하지 않으면 false와 함께 error message를 반환한다.', async () => {
       userRepository.findOne.mockResolvedValue(null);
       const result = await userService.getUserById({ userId: 1 });
+      expect(result).toEqual({
+        ok: false,
+        error: '존재하지 않는 사용자입니다.',
+      });
+    });
+  });
+
+  describe('editUser', () => {
+    it('userId가 존재할 경우 유저 수정은 성공한다.', async () => {
+      const mockUser = {
+        id: 1,
+        username: 'tester',
+      };
+      userRepository.findOne.mockResolvedValue(mockUser);
+
+      const editUserInput: EditUserInput = {
+        id: mockUser.id,
+        username: 'editUser',
+        password: 'change123!',
+      };
+      const result = await userService.editUser(editUserInput);
+
+      expect(userRepository.save).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('userId가 존재하지 않을 경우 유저 수정은 실패한다.', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+
+      const editUserInput: EditUserInput = {
+        id: 1,
+        username: 'editUser',
+      };
+
+      const result = await userService.editUser(editUserInput);
+
+      expect(userRepository.save).toHaveBeenCalledTimes(0);
+      expect(result).toEqual({
+        ok: false,
+        error: '존재하지 않는 사용자입니다.',
+      });
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('userId가 존재하면 유저 softRemove가 성공한다.', async () => {
+      const queryRunner = dataSource.createQueryRunner();
+      const mockUser = {
+        id: 1,
+        username: 'tester',
+      };
+      userRepository.findOne.mockResolvedValue(mockUser);
+
+      const result = await userService.deleteUser({ userId: mockUser.id });
+
+      expect(queryRunner.manager.softRemove).toHaveBeenCalledTimes(1);
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('userId가 존재하지 않으면 유저 삭제는 실패가 된다.', async () => {
+      const queryRunner = dataSource.createQueryRunner();
+      userRepository.findOne.mockResolvedValue(null);
+
+      const result = await userService.deleteUser({ userId: 1 });
+
+      expect(queryRunner.manager.softRemove).toHaveBeenCalledTimes(0);
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
       expect(result).toEqual({
         ok: false,
         error: '존재하지 않는 사용자입니다.',
