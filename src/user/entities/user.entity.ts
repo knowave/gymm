@@ -1,11 +1,19 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsEmail, IsString, Length, Matches } from 'class-validator';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
+import { IsEmail, IsEnum, IsString, Length, Matches } from 'class-validator';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
 import { Trainer } from 'src/trainer/entities/trainer.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { UserRole } from '../enums/user-role.enum';
+
+registerEnumType(UserRole, { name: 'UserRole' });
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -37,6 +45,10 @@ export class User extends BaseEntity {
   @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
   jwtToken?: string;
+
+  @Field(() => UserRole, { defaultValue: UserRole.CLIENT })
+  @IsEnum(UserRole)
+  role: UserRole;
 
   @OneToOne(() => Trainer, {
     nullable: true,
