@@ -9,8 +9,7 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
-import { Trainer } from 'src/trainer/entities/trainer.entity';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
 
 registerEnumType(UserRole, { name: 'UserRole' });
@@ -49,14 +48,6 @@ export class User extends BaseEntity {
   @Field(() => UserRole, { defaultValue: UserRole.CLIENT })
   @IsEnum(UserRole)
   role: UserRole;
-
-  @OneToOne(() => Trainer, {
-    nullable: true,
-    onDelete: 'CASCADE',
-    cascade: ['soft-remove'],
-  })
-  @JoinColumn()
-  trainer?: Trainer;
 
   @Field(() => [Feed], { nullable: true })
   @OneToMany(() => Feed, (feed) => feed.user, {

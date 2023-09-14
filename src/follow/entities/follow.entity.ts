@@ -1,7 +1,6 @@
 import { ObjectType, Field, Int, InputType } from '@nestjs/graphql';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
-import { Trainer } from 'src/trainer/entities/trainer.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, ManyToOne } from 'typeorm';
 
@@ -26,13 +25,4 @@ export class Follow extends BaseEntity {
     cascade: ['soft-remove'],
   })
   gym?: Gym;
-
-  @Field(() => Trainer, { nullable: true })
-  @ManyToOne(() => Trainer, (trainer) => trainer.follows, {
-    eager: true,
-    nullable: true,
-    onDelete: 'CASCADE',
-    cascade: ['soft-remove'],
-  })
-  trainer?: Trainer;
 }

@@ -4,7 +4,6 @@ import { Feed } from 'src/feed/entities/feed.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { Like } from 'src/like/entities/like.entity';
 import { Reply } from 'src/reply/entities/reply.entity';
-import { Trainer } from 'src/trainer/entities/trainer.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
@@ -36,15 +35,6 @@ export class Gym extends BaseEntity {
     cascade: ['soft-remove'],
   })
   user?: User;
-
-  @Field(() => Trainer, { nullable: true })
-  @ManyToOne(() => Trainer, (trainer) => trainer.gyms, {
-    eager: true,
-    nullable: true,
-    onDelete: 'CASCADE',
-    cascade: ['soft-remove'],
-  })
-  trainer?: Trainer;
 
   @Field(() => Feed, { nullable: true })
   @ManyToOne(() => Feed, (feed) => feed.gyms, {
