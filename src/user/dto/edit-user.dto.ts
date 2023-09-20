@@ -1,4 +1,4 @@
-import { BaseOutput } from 'src/common/base-output.dto';
+import { BaseOutput } from 'src/common/dto/base-output.dto';
 import { User } from '../entities/user.entity';
 import { InputType, Field, PartialType, ObjectType } from '@nestjs/graphql';
 

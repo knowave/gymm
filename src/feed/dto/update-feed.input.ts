@@ -1,4 +1,4 @@
-import { CreateFeedInput } from './create-feed.input';
+import { CreateFeedInput } from './create-feed.dto';
 import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 
 @InputType()
