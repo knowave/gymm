@@ -52,14 +52,14 @@ export class FeedService {
     skip,
     status,
     query,
-    title,
+    searchtype,
   }: GetAllFeedInput): Promise<GetAllFeedOutput> {
     try {
       const trimQuery = query?.trim();
       const take = skip ? skip : null;
 
       const where = {
-        title: title ? ILike(`${query}`) : null,
+        title: trimQuery !== '' ? ILike(`${query}`) : null,
       };
 
       where.title ? where.title : delete where['title'];

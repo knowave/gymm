@@ -1,9 +1,22 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import {
   PaginationInput,
   PaginationOutput,
 } from 'src/common/dto/pagination.dto';
 import { Feed, FeedStatus } from '../entities/feed.entity';
+
+export enum FeedSearchTypeByAdmin {
+  TITLE = 'TITLE',
+}
+
+registerEnumType(FeedSearchTypeByAdmin, {
+  name: 'FocusOnSearchTypeByAdmin',
+});
 
 @InputType()
 export class GetAllFeedInput extends PaginationInput {
@@ -16,8 +29,8 @@ export class GetAllFeedInput extends PaginationInput {
   @Field(() => String, { nullable: true })
   query?: string;
 
-  @Field(() => String, { nullable: true })
-  title: string;
+  @Field(() => FeedSearchTypeByAdmin, { nullable: true })
+  searchtype?: FeedSearchTypeByAdmin;
 }
 
 @ObjectType()
