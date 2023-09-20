@@ -24,7 +24,7 @@ export class Feed extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
-  @Column({ enum: FeedStatus, type: 'enum' })
+  @Column({ enum: FeedStatus, type: 'enum', default: FeedStatus.PUBLIC })
   @Field(() => FeedStatus)
   @IsEnum(FeedStatus)
   status: FeedStatus;
