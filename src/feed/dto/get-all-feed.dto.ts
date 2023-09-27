@@ -8,7 +8,7 @@ import {
   PaginationInput,
   PaginationOutput,
 } from 'src/common/dto/pagination.dto';
-import { Feed, FeedStatus } from '../entities/feed.entity';
+import { Feed } from '../entities/feed.entity';
 
 export enum FeedSearchTypeByAdmin {
   TITLE = 'TITLE',
@@ -22,9 +22,6 @@ registerEnumType(FeedSearchTypeByAdmin, {
 export class GetAllFeedInput extends PaginationInput {
   @Field(() => Number, { nullable: true })
   skip?: number;
-
-  @Field(() => FeedStatus, { nullable: true })
-  status?: FeedStatus;
 
   @Field(() => String, { nullable: true })
   query?: string;

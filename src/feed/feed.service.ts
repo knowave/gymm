@@ -5,7 +5,11 @@ import { DataSource, ILike, In, Repository } from 'typeorm';
 import { Feed } from './entities/feed.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { GetAllFeedInput, GetAllFeedOutput } from './dto/get-all-feed.dto';
+import {
+  FeedSearchTypeByAdmin,
+  GetAllFeedInput,
+  GetAllFeedOutput,
+} from './dto/get-all-feed.dto';
 
 @Injectable()
 export class FeedService {
@@ -50,16 +54,17 @@ export class FeedService {
   async getAllFeed({
     page,
     skip,
-    status,
     query,
     searchtype,
   }: GetAllFeedInput): Promise<GetAllFeedOutput> {
     try {
-      const trimQuery = query?.trim();
       const take = skip ? skip : null;
 
       const where = {
-        title: trimQuery !== '' ? ILike(`${query}`) : null,
+        title:
+          searchtype === FeedSearchTypeByAdmin.TITLE
+            ? ILike(`%${query}%`)
+            : null,
       };
 
       where.title ? where.title : delete where['title'];
