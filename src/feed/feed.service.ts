@@ -10,6 +10,7 @@ import {
   GetAllFeedInput,
   GetAllFeedOutput,
 } from './dto/get-all-feed.dto';
+import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed.dto';
 
 @Injectable()
 export class FeedService {
@@ -90,8 +91,21 @@ export class FeedService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} feed`;
+  async getFeedById({ feedId }: GetFeedByIdInput): Promise<GetFeedByIdOutput> {
+    try {
+      const feed = await this.feedRepository.findOne({
+        relations: ['user'],
+        where: { id: feedId },
+      });
+
+      if (!feed) {
+        return { ok: false, error: '존재하는 게시물이 없습니다.' };
+      }
+
+      return { ok: true, feed };
+    } catch (err) {
+      throw err;
+    }
   }
 
   update(id: number, updateFeedInput: UpdateFeedInput) {
