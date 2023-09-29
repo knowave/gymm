@@ -15,6 +15,10 @@ import {
   EditFeedByUserInput,
   EditFeedByUserOutput,
 } from './dto/edit-feed-by-user.dto';
+import {
+  DeleteFeedByUserInput,
+  DeleteFeedByUserOutput,
+} from './dto/delete-feed-by-user.dto';
 
 @Injectable()
 export class FeedService {
@@ -132,6 +136,31 @@ export class FeedService {
       feed.status = status;
 
       await queryRunner.manager.save(Feed, feed);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteFeedByUser(
+    { feedId }: DeleteFeedByUserInput,
+    user: User,
+  ): Promise<DeleteFeedByUserOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const feed = await this.feedRepository.findOne({
+        where: { id: feedId, user: { id: user.id } },
+      });
+
+      if (!feed) return { ok: false, error: '존재하지 않는 게시물입니다.' };
+
+      await queryRunner.manager.softRemove(Feed, feed);
       await queryRunner.commitTransaction();
       return { ok: true };
     } catch (err) {
