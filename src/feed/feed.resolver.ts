@@ -9,6 +9,10 @@ import {
   EditFeedByUserOutput,
 } from './dto/edit-feed-by-user.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import {
+  DeleteFeedByUserInput,
+  DeleteFeedByUserOutput,
+} from './dto/delete-feed-by-user.dto';
 
 @Resolver()
 export class FeedResolver {
@@ -42,5 +46,13 @@ export class FeedResolver {
     @CurrentUser() user: User,
   ): Promise<EditFeedByUserOutput> {
     return this.feedService.editFeedByUser(editFeedByUserInput, user);
+  }
+
+  @Mutation(() => DeleteFeedByUserOutput)
+  async deleteFeedByUser(
+    @Args('input') deleteFeedByUserInput: DeleteFeedByUserInput,
+    @CurrentUser() user: User,
+  ): Promise<DeleteFeedByUserOutput> {
+    return this.feedService.deleteFeedByUser(deleteFeedByUserInput, user);
   }
 }
