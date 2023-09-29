@@ -4,6 +4,11 @@ import { CreateFeedInput, CreateFeedOutput } from './dto/create-feed.dto';
 import { User } from 'src/user/entities/user.entity';
 import { GetAllFeedInput, GetAllFeedOutput } from './dto/get-all-feed.dto';
 import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed-by-id.dto';
+import {
+  EditFeedByUserInput,
+  EditFeedByUserOutput,
+} from './dto/edit-feed-by-user.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Resolver()
 export class FeedResolver {
@@ -29,5 +34,13 @@ export class FeedResolver {
     @Args('input') getFeedInput: GetFeedByIdInput,
   ): Promise<GetFeedByIdOutput> {
     return this.feedService.getFeedById(getFeedInput);
+  }
+
+  @Mutation(() => EditFeedByUserOutput)
+  async editFeedByUser(
+    @Args('input') editFeedByUserInput: EditFeedByUserInput,
+    @CurrentUser() user: User,
+  ): Promise<EditFeedByUserOutput> {
+    return this.feedService.editFeedByUser(editFeedByUserInput, user);
   }
 }
