@@ -11,6 +11,10 @@ import {
   GetAllFeedOutput,
 } from './dto/get-all-feed.dto';
 import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed-by-id.dto';
+import {
+  EditFeedByUserInput,
+  EditFeedByUserOutput,
+} from './dto/edit-feed-by-user.dto';
 
 @Injectable()
 export class FeedService {
@@ -108,5 +112,33 @@ export class FeedService {
     }
   }
 
-  async editFeedByUser() {}
+  async editFeedByUser(
+    { feedId, title, description, status }: EditFeedByUserInput,
+    user: User,
+  ): Promise<EditFeedByUserOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const feed = await this.feedRepository.findOne({
+        relations: ['user'],
+        where: { id: feedId, user: { id: user.id } },
+      });
+
+      if (!feed) return { ok: false, error: '존재하는 게시물이 없습니다.' };
+
+      feed.title = title;
+      feed.description = description;
+      feed.status = status;
+
+      await queryRunner.manager.save(Feed, feed);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }
