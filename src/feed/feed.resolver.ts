@@ -3,7 +3,7 @@ import { FeedService } from './feed.service';
 import { CreateFeedInput, CreateFeedOutput } from './dto/create-feed.dto';
 import { User } from 'src/user/entities/user.entity';
 import { GetAllFeedInput, GetAllFeedOutput } from './dto/get-all-feed.dto';
-import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed.dto';
+import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed-by-id.dto';
 
 @Resolver()
 export class FeedResolver {

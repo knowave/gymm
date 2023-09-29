@@ -10,7 +10,7 @@ import {
   GetAllFeedInput,
   GetAllFeedOutput,
 } from './dto/get-all-feed.dto';
-import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed.dto';
+import { GetFeedByIdInput, GetFeedByIdOutput } from './dto/get-feed-by-id.dto';
 
 @Injectable()
 export class FeedService {
@@ -108,11 +108,5 @@ export class FeedService {
     }
   }
 
-  update(id: number, updateFeedInput: UpdateFeedInput) {
-    return `This action updates a #${id} feed`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} feed`;
-  }
+  async editFeedByUser() {}
 }
