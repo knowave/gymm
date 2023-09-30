@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Gym } from './entities/gym.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import {
   CreateGymByTrainerInput,
   CreateGymByTrainerOutput,
 } from './dto/create-gym-by-trainer.dto';
+import {
+  GetAllGymInput,
+  GetAllGymOutput,
+  GymSearchType,
+} from './dto/get-all-gym.dto';
 
 @Injectable()
 export class GymService {
@@ -59,6 +64,40 @@ export class GymService {
       throw err;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async getAllFeed({
+    page,
+    skip,
+    query,
+    searchtype,
+  }: GetAllGymInput): Promise<GetAllGymOutput> {
+    try {
+      const take = skip ? skip : null;
+
+      const where = {
+        name: searchtype === GymSearchType.NAME ? ILike(`%${query}%`) : null,
+      };
+
+      where.name ? where.name : delete where['name'];
+
+      const [totalGyms, totalResults] = await this.gymRepository.findAndCount({
+        relations: ['user'],
+        where,
+        skip: (page - 1) * take,
+        take,
+        order: { createdAt: 'DESC' },
+      });
+
+      return {
+        ok: true,
+        totalGyms,
+        totalPages: skip ? Math.ceil(totalResults / take) : null,
+        totalResults,
+      };
+    } catch (err) {
+      throw err;
     }
   }
 }
