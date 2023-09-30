@@ -4,9 +4,6 @@ import { UserRole } from 'src/user/enums/user-role.enum';
 
 @InputType()
 export class CreateTrainerByUserInput {
-  @Field(() => Number)
-  userId: number;
-
   @Field(() => UserRole)
   role: UserRole;
 }

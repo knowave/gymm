@@ -16,17 +16,17 @@ export class TrainerService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async createTrainerByUser({
-    userId,
-    role,
-  }: CreateTrainerByUserInput): Promise<CreateTrainerByUserOutput> {
+  async createTrainerByUser(
+    { role }: CreateTrainerByUserInput,
+    user: User,
+  ): Promise<CreateTrainerByUserOutput> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
       const userForTrainer = await this.userRepository.findOne({
-        where: { id: userId },
+        where: { id: user.id },
       });
 
       if (!userForTrainer)
