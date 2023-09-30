@@ -1,4 +1,64 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Gym } from './entities/gym.entity';
+import { DataSource, Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import {
+  CreateGymByTrainerInput,
+  CreateGymByTrainerOutput,
+} from './dto/create-gym-by-trainer.dto';
 
 @Injectable()
-export class GymService {}
+export class GymService {
+  constructor(
+    @InjectRepository(Gym)
+    private readonly gymRepository: Repository<Gym>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly dataSource: DataSource,
+  ) {}
+
+  async createGymByTrainer(
+    { name, gymInfo, location }: CreateGymByTrainerInput,
+    user: User,
+  ): Promise<CreateGymByTrainerOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      if (!name)
+        return {
+          ok: false,
+          error: '등록하고자 하는 Gym 이름을 기재해 주세요.',
+        };
+
+      if (!gymInfo)
+        return {
+          ok: false,
+          error: '등록하고자 하는 Gym 정보를 기재해 주세요.',
+        };
+
+      if (!location)
+        return {
+          ok: false,
+          error: '등록하고자 하는 Gym 위치를 기재해 주세요.',
+        };
+
+      const createGym = queryRunner.manager.create(Gym, {
+        name,
+        gymInfo,
+        location,
+        user,
+      });
+
+      await queryRunner.manager.save(createGym);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+}
