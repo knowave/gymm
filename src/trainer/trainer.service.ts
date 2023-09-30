@@ -1,26 +1,51 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTrainerInput } from './dto/create-trainer.input';
-import { UpdateTrainerInput } from './dto/update-trainer.input';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { DataSource, Repository } from 'typeorm';
+import {
+  CreateTrainerByUserInput,
+  CreateTrainerByUserOutput,
+} from './dto/create-trainer-by-user.input';
+import { UserRole } from 'src/user/enums/user-role.enum';
 
 @Injectable()
 export class TrainerService {
-  create(createTrainerInput: CreateTrainerInput) {
-    return 'This action adds a new trainer';
-  }
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly dataSource: DataSource,
+  ) {}
 
-  findAll() {
-    return `This action returns all trainer`;
-  }
+  async createTrainerByUser({
+    userId,
+    role,
+  }: CreateTrainerByUserInput): Promise<CreateTrainerByUserOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-  findOne(id: number) {
-    return `This action returns a #${id} trainer`;
-  }
+    try {
+      const userForTrainer = await this.userRepository.findOne({
+        where: { id: userId },
+      });
 
-  update(id: number, updateTrainerInput: UpdateTrainerInput) {
-    return `This action updates a #${id} trainer`;
-  }
+      if (!userForTrainer)
+        return { ok: false, error: '존재하지 않는 사용자입니다.' };
 
-  remove(id: number) {
-    return `This action removes a #${id} trainer`;
+      if (role === UserRole.CLIENT) {
+        return { ok: false, error: '다시 한번 역할을 확인해 주세요.' };
+      }
+
+      userForTrainer.role = role;
+
+      await queryRunner.manager.save(userForTrainer);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
