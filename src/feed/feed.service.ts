@@ -6,7 +6,7 @@ import { Feed } from './entities/feed.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import {
-  FeedSearchTypeByAdmin,
+  FeedSearchType,
   GetAllFeedInput,
   GetAllFeedOutput,
 } from './dto/get-all-feed.dto';
@@ -70,10 +70,7 @@ export class FeedService {
       const take = skip ? skip : null;
 
       const where = {
-        title:
-          searchtype === FeedSearchTypeByAdmin.TITLE
-            ? ILike(`%${query}%`)
-            : null,
+        title: searchtype === FeedSearchType.TITLE ? ILike(`%${query}%`) : null,
       };
 
       where.title ? where.title : delete where['title'];

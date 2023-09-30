@@ -10,12 +10,12 @@ import {
 } from 'src/common/dto/pagination.dto';
 import { Feed } from '../entities/feed.entity';
 
-export enum FeedSearchTypeByAdmin {
+export enum FeedSearchType {
   TITLE = 'TITLE',
 }
 
-registerEnumType(FeedSearchTypeByAdmin, {
-  name: 'FocusOnSearchTypeByAdmin',
+registerEnumType(FeedSearchType, {
+  name: 'FeedSearchType',
 });
 
 @InputType()
@@ -26,8 +26,8 @@ export class GetAllFeedInput extends PaginationInput {
   @Field(() => String, { nullable: true })
   query?: string;
 
-  @Field(() => FeedSearchTypeByAdmin, { nullable: true })
-  searchtype?: FeedSearchTypeByAdmin;
+  @Field(() => FeedSearchType, { nullable: true })
+  searchtype?: FeedSearchType;
 }
 
 @ObjectType()
