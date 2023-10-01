@@ -12,6 +12,8 @@ import {
   GetAllGymOutput,
   GymSearchType,
 } from './dto/get-all-gym.dto';
+import { GetGymByIdInput, GetGymByIdOutput } from './dto/get-gym-by-id.dto';
+import { sortByCreatedAtDesc } from 'src/common/constant/common.functions';
 
 @Injectable()
 export class GymService {
@@ -96,6 +98,34 @@ export class GymService {
         totalPages: skip ? Math.ceil(totalResults / take) : null,
         totalResults,
       };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getGymById({ gymId }: GetGymByIdInput): Promise<GetGymByIdOutput> {
+    try {
+      const gym = await this.gymRepository.findOne({
+        relations: ['user', 'feeds', 'like', 'reply'],
+        where: { id: gymId },
+      });
+
+      if (!gym) return { ok: false, error: '존재하는 Gym이 없습니다.' };
+
+      // Gym의 Feed를 createdAt 내림차순
+      if (gym.feeds) {
+        gym.feeds.sort(sortByCreatedAtDesc);
+      }
+
+      // Gym의 Reply를 createdAt 내림차순
+      if (gym.replies) {
+        gym.replies.sort(sortByCreatedAtDesc);
+      }
+
+      // Gym의 Feed와 Reply를 5개만 출력
+      gym.feeds = gym.feeds.slice(0, 5);
+      gym.replies = gym.replies.slice(0, 5);
+      return { ok: true, gym };
     } catch (err) {
       throw err;
     }
