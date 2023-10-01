@@ -9,6 +9,10 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Role } from 'src/auth/decorators/user-role.decorator';
 import { GetAllGymInput, GetAllGymOutput } from './dto/get-all-gym.dto';
 import { GetGymByIdInput, GetGymByIdOutput } from './dto/get-gym-by-id.dto';
+import {
+  EditGymByTrainerInput,
+  EditGymByTrainerOutput,
+} from './dto/edit-gym-by-trainer.dto';
 
 @Resolver()
 export class GymResolver {
@@ -37,5 +41,14 @@ export class GymResolver {
     @Args('input') getGymByIdInput: GetGymByIdInput,
   ): Promise<GetGymByIdOutput> {
     return this.gymService.getGymById(getGymByIdInput);
+  }
+
+  @Query(() => EditGymByTrainerOutput)
+  @Role(['TRAINER'])
+  async editGymByTrainer(
+    @Args('input') editGymByTrainerInput: EditGymByTrainerInput,
+    @CurrentUser() user: User,
+  ): Promise<EditGymByTrainerOutput> {
+    return this.gymService.editGymByTrainer(editGymByTrainerInput, user);
   }
 }
