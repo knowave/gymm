@@ -39,13 +39,13 @@ export class Feed extends BaseEntity {
   user?: User;
 
   @Field(() => [Gym], { nullable: true })
-  @OneToMany(() => Gym, (gym) => gym.feed, {
+  @OneToMany(() => Gym, (gym) => gym.feeds, {
     eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
   })
-  gyms?: Gym[];
+  gym?: Gym;
 
   @Field(() => [Like], { nullable: true })
   @OneToMany(() => Like, (like) => like.feed, {

@@ -37,13 +37,13 @@ export class Gym extends BaseEntity {
   user?: User;
 
   @Field(() => Feed, { nullable: true })
-  @ManyToOne(() => Feed, (feed) => feed.gyms, {
+  @ManyToOne(() => Feed, (feed) => feed.gym, {
     eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
   })
-  feed?: Feed;
+  feeds?: Feed[];
 
   @Field(() => [Follow], { nullable: true })
   @OneToMany(() => Follow, (follow) => follow.gym, {
