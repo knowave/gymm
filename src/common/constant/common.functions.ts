@@ -85,3 +85,9 @@ export function checkAvailableDate(startDate: Date, endDate: Date) {
     throw error;
   }
 }
+
+export function sortByCreatedAtDesc(a, b) {
+  if (a.createdAt > b.createdAt) return -1;
+  if (a.createdAt < b.createdAt) return 1;
+  return 0;
+}
