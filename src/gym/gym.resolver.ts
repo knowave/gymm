@@ -25,6 +25,6 @@ export class GymResolver {
   @Query(() => GetAllGymOutput)
   @Role(['ANY'])
   async getAllGym(@Args('input') getAllGymInput: GetAllGymInput): Promise<GetAllGymOutput> {
-    return this.gymService.getAllFeed(getAllGymInput)
+    return this.gymService.getAllGym(getAllGymInput);
   }
 }

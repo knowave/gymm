@@ -67,7 +67,7 @@ export class GymService {
     }
   }
 
-  async getAllFeed({
+  async getAllGym({
     page,
     skip,
     query,
