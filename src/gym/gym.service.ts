@@ -14,6 +14,11 @@ import {
 } from './dto/get-all-gym.dto';
 import { GetGymByIdInput, GetGymByIdOutput } from './dto/get-gym-by-id.dto';
 import { sortByCreatedAtDesc } from 'src/common/constant/common.functions';
+import {
+  EditGymByTrainerInput,
+  EditGymByTrainerOutput,
+} from './dto/edit-gym-by-trainer.dto';
+import { UserRole } from 'src/user/enums/user-role.enum';
 
 @Injectable()
 export class GymService {
@@ -128,6 +133,34 @@ export class GymService {
       return { ok: true, gym };
     } catch (err) {
       throw err;
+    }
+  }
+
+  async editGymByTrainer(
+    { gymId, name, gymInfo, location }: EditGymByTrainerInput,
+    user: User,
+  ): Promise<EditGymByTrainerOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const gym = await this.gymRepository.findOne({
+        relations: ['user'],
+        where: { id: gymId, user: { id: user.id, role: UserRole.TRAINER } },
+      });
+
+      if (!gym) return { ok: false, error: '존재하는 Gym이 없습니다.' };
+
+      gym.name = name;
+      gym.gymInfo = gymInfo;
+      gym.location = location;
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 }
