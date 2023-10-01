@@ -8,6 +8,7 @@ import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Role } from 'src/auth/decorators/user-role.decorator';
 import { GetAllGymInput, GetAllGymOutput } from './dto/get-all-gym.dto';
+import { GetGymByIdInput, GetGymByIdOutput } from './dto/get-gym-by-id.dto';
 
 @Resolver()
 export class GymResolver {
@@ -24,7 +25,17 @@ export class GymResolver {
 
   @Query(() => GetAllGymOutput)
   @Role(['ANY'])
-  async getAllGym(@Args('input') getAllGymInput: GetAllGymInput): Promise<GetAllGymOutput> {
+  async getAllGym(
+    @Args('input') getAllGymInput: GetAllGymInput,
+  ): Promise<GetAllGymOutput> {
     return this.gymService.getAllGym(getAllGymInput);
+  }
+
+  @Query(() => GetGymByIdOutput)
+  @Role(['ANY'])
+  async getGymById(
+    @Args('input') getGymByIdInput: GetGymByIdInput,
+  ): Promise<GetGymByIdOutput> {
+    return this.gymService.getGymById(getGymByIdInput);
   }
 }
