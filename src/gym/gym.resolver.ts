@@ -13,6 +13,10 @@ import {
   EditGymByTrainerInput,
   EditGymByTrainerOutput,
 } from './dto/edit-gym-by-trainer.dto';
+import {
+  DeleteGymByTrainerInput,
+  DeleteGymByTrainerOutput,
+} from './dto/delete-gym-by-trainer.dto';
 
 @Resolver()
 export class GymResolver {
@@ -50,5 +54,14 @@ export class GymResolver {
     @CurrentUser() user: User,
   ): Promise<EditGymByTrainerOutput> {
     return this.gymService.editGymByTrainer(editGymByTrainerInput, user);
+  }
+
+  @Mutation(() => DeleteGymByTrainerOutput)
+  @Role(['TRAINER'])
+  async deleteGymByTrainer(
+    @Args('input') deleteGymByTrainerInput: DeleteGymByTrainerInput,
+    @CurrentUser() user: User,
+  ): Promise<DeleteGymByTrainerOutput> {
+    return this.gymService.deleteGymByTrainer(deleteGymByTrainerInput, user);
   }
 }
