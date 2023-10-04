@@ -43,7 +43,7 @@ export class GymResolver {
     return this.gymService.getGymById(getGymByIdInput);
   }
 
-  @Query(() => EditGymByTrainerOutput)
+  @Mutation(() => EditGymByTrainerOutput)
   @Role(['TRAINER'])
   async editGymByTrainer(
     @Args('input') editGymByTrainerInput: EditGymByTrainerInput,
