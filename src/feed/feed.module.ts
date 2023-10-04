@@ -3,6 +3,6 @@ import { FeedService } from './feed.service';
 import { FeedResolver } from './feed.resolver';
 
 @Module({
-  providers: [FeedResolver, FeedService]
+  providers: [FeedResolver, FeedService],
 })
 export class FeedModule {}
