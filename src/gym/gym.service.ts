@@ -19,6 +19,10 @@ import {
   EditGymByTrainerOutput,
 } from './dto/edit-gym-by-trainer.dto';
 import { UserRole } from 'src/user/enums/user-role.enum';
+import {
+  DeleteGymByTrainerInput,
+  DeleteGymByTrainerOutput,
+} from './dto/delete-gym-by-trainer.dto';
 
 @Injectable()
 export class GymService {
@@ -154,6 +158,32 @@ export class GymService {
       gym.name = name;
       gym.gymInfo = gymInfo;
       gym.location = location;
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteGymByTrainer(
+    { gymId }: DeleteGymByTrainerInput,
+    user: User,
+  ): Promise<DeleteGymByTrainerOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const gym = await this.gymRepository.findOne({
+        relations: ['user'],
+        where: { id: gymId, user: { id: user.id, role: UserRole.TRAINER } },
+      });
+
+      if (!gym) return { ok: false, error: '존재하는 Gym이 없습니다.' };
+
+      await queryRunner.manager.softRemove(Gym, gym);
       await queryRunner.commitTransaction();
       return { ok: true };
     } catch (err) {
