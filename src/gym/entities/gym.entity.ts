@@ -27,6 +27,14 @@ export class Gym extends BaseEntity {
   @Column('text', { nullable: true })
   location?: string;
 
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  latitude: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  longitude?: string;
+
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.gyms, {
     eager: true,
