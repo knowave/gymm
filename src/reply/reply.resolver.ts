@@ -11,6 +11,14 @@ import {
   WriteReplyByGymInput,
   WriteReplyByGymOutput,
 } from './dto/write-reply-by-gym.dto';
+import {
+  EditReplyByFeedInput,
+  EditReplyByFeedOutput,
+} from './dto/edit-reply-by-feed.dto';
+import {
+  EditReplyByGymInput,
+  EditReplyByGymOutput,
+} from './dto/edit-reply-by-gym.dto';
 
 @Resolver(() => Reply)
 export class ReplyResolver {
@@ -30,5 +38,21 @@ export class ReplyResolver {
     @CurrentUser() user: User,
   ): Promise<WriteReplyByGymOutput> {
     return this.replyService.writeReplyByGym(writeReplyByGymInput, user);
+  }
+
+  @Mutation(() => EditReplyByFeedOutput)
+  async editReplyByFeed(
+    @Args('input') writeReplyByGymInput: EditReplyByFeedInput,
+    @CurrentUser() user: User,
+  ): Promise<EditReplyByFeedOutput> {
+    return this.replyService.editReplyByFeed(writeReplyByGymInput, user);
+  }
+
+  @Mutation(() => EditReplyByGymOutput)
+  async editReplyByGym(
+    @Args('input') writeReplyByGymInput: EditReplyByGymInput,
+    @CurrentUser() user: User,
+  ): Promise<EditReplyByGymOutput> {
+    return this.replyService.editReplyByGym(writeReplyByGymInput, user);
   }
 }

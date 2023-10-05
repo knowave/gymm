@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ReplyService } from './reply.service';
-import { ReplyResolver } from './reply.resolver';
+import { ReplyResolver } from './ReplyResolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
