@@ -9,6 +9,10 @@ import {
   ToggleLikeToFeedInput,
   ToggleLikeToFeedOutput,
 } from './dto/toggle-like-to-feed-dto';
+import {
+  ToggleLikeToGymInput,
+  ToggleLikeToGymOutput,
+} from './dto/toggle-like-to-gym.dto';
 
 @Injectable()
 export class LikeService {
@@ -57,6 +61,43 @@ export class LikeService {
         await queryRunner.manager.softRemove(Like, like);
         await queryRunner.commitTransaction();
         return { ok: true, feedLike: false };
+      }
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async toggleLikeToGym(
+    { gymId }: ToggleLikeToGymInput,
+    user: User,
+  ): Promise<ToggleLikeToGymOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const gym = await this.gymRepository.findOne({ where: { id: gymId } });
+      const like = await this.likeRepository.findOne({
+        relations: ['gym', 'user'],
+        where: { gym: { id: gymId }, user: { id: user.id } },
+      });
+
+      if (!gym) return { ok: false, error: '존재하는 Gym이 없습니다.' };
+
+      if (!like) {
+        const liked = queryRunner.manager.create(Like, {
+          gym: gym,
+          user: user,
+        });
+        await queryRunner.manager.save(liked);
+        await queryRunner.commitTransaction();
+        return { ok: true, gymLike: true };
+      } else {
+        await queryRunner.manager.softRemove(Like, like);
+        await queryRunner.commitTransaction();
+        return { ok: true, gymLike: false };
       }
     } catch (err) {
       await queryRunner.rollbackTransaction();
