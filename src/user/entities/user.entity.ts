@@ -11,6 +11,7 @@ import { Follow } from 'src/follow/entities/follow.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+import { Like } from 'src/like/entities/like.entity';
 
 registerEnumType(UserRole, { name: 'UserRole' });
 
@@ -75,4 +76,13 @@ export class User extends BaseEntity {
     cascade: ['soft-remove'],
   })
   follows?: Follow[];
+
+  @Field(() => [Like], { nullable: true })
+  @OneToMany(() => Like, (like) => like.user, {
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+    cascade: ['soft-remove'],
+  })
+  likes?: Like[];
 }
