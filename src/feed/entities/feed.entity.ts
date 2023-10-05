@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, InputType } from '@nestjs/graphql';
+import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { IsEnum } from 'class-validator';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
