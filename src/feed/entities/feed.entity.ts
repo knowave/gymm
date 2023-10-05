@@ -29,6 +29,10 @@ export class Feed extends BaseEntity {
   @IsEnum(FeedStatus)
   status: FeedStatus;
 
+  @Field(() => Number, { nullable: true })
+  @Column({ nullable: true })
+  likeCount?: number;
+
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.feeds, {
     eager: true,

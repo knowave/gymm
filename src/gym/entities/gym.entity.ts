@@ -35,6 +35,10 @@ export class Gym extends BaseEntity {
   @Column({ nullable: true })
   longitude?: string;
 
+  @Field(() => Number, { nullable: true })
+  @Column({ nullable: true })
+  likeCount?: number;
+
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.gyms, {
     eager: true,
