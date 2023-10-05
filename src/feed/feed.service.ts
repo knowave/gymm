@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFeedInput, CreateFeedOutput } from './dto/create-feed.dto';
-import { UpdateFeedInput } from './dto/update-feed.input';
-import { DataSource, ILike, In, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 import { Feed } from './entities/feed.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
