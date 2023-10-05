@@ -2,6 +2,7 @@ import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
+import { Reply } from 'src/reply/entities/reply.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, ManyToOne } from 'typeorm';
 
@@ -35,4 +36,13 @@ export class Like extends BaseEntity {
     cascade: ['soft-remove'],
   })
   user?: User;
+
+  @Field(() => Reply, { nullable: true })
+  @ManyToOne(() => Reply, (reply) => reply.likes, {
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+    cascade: ['soft-remove'],
+  })
+  reply?: Reply;
 }
