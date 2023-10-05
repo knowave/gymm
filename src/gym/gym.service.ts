@@ -94,7 +94,7 @@ export class GymService {
       where.name ? where.name : delete where['name'];
 
       const [totalGyms, totalResults] = await this.gymRepository.findAndCount({
-        relations: ['user'],
+        relations: ['user', 'like'],
         where,
         skip: (page - 1) * take,
         take,
@@ -115,7 +115,7 @@ export class GymService {
   async getGymById({ gymId }: GetGymByIdInput): Promise<GetGymByIdOutput> {
     try {
       const gym = await this.gymRepository.findOne({
-        relations: ['user', 'feeds', 'like', 'reply'],
+        relations: ['user', 'feed', 'like', 'reply'],
         where: { id: gymId },
       });
 

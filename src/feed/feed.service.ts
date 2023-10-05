@@ -76,7 +76,7 @@ export class FeedService {
 
       const [totalFeeds, totalResults] = await this.feedRepository.findAndCount(
         {
-          relations: ['user'],
+          relations: ['user', 'like'],
           where,
           skip: (page - 1) * take,
           take,
@@ -98,7 +98,7 @@ export class FeedService {
   async getFeedById({ feedId }: GetFeedByIdInput): Promise<GetFeedByIdOutput> {
     try {
       const feed = await this.feedRepository.findOne({
-        relations: ['user'],
+        relations: ['user', 'like', 'reply', 'gym'],
         where: { id: feedId },
       });
 
