@@ -54,10 +54,16 @@ export class LikeService {
           feed: feed,
           user: user,
         });
+
+        feed.likeCount++;
+        await queryRunner.manager.save(feed);
         await queryRunner.manager.save(liked);
         await queryRunner.commitTransaction();
+
         return { ok: true, feedLike: true };
       } else {
+        feed.likeCount--;
+        await queryRunner.manager.save(feed);
         await queryRunner.manager.softRemove(Like, like);
         await queryRunner.commitTransaction();
         return { ok: true, feedLike: false };
@@ -91,10 +97,15 @@ export class LikeService {
           gym: gym,
           user: user,
         });
+
+        gym.likeCount++;
+        await queryRunner.manager.save(gym);
         await queryRunner.manager.save(liked);
         await queryRunner.commitTransaction();
         return { ok: true, gymLike: true };
       } else {
+        gym.likeCount--;
+        await queryRunner.manager.save(gym);
         await queryRunner.manager.softRemove(Like, like);
         await queryRunner.commitTransaction();
         return { ok: true, gymLike: false };
