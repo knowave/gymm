@@ -11,6 +11,10 @@ import {
   ToggleLikeToFeedOutput,
 } from './dto/toggle-like-to-feed-dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import {
+  ToggleLikeToReplyInput,
+  ToggleLikeToReplyOutput,
+} from './dto/toggel-like-to-reply.dto';
 
 @Resolver(() => Like)
 export class LikeResolver {
@@ -30,5 +34,13 @@ export class LikeResolver {
     @CurrentUser() user: User,
   ): Promise<ToggleLikeToGymOutput> {
     return this.likeService.toggleLikeToGym(toggleLikeToGymInput, user);
+  }
+
+  @Mutation(() => ToggleLikeToReplyOutput)
+  async toggleLikeToReply(
+    @Args('input') toggleLikeToReplyInput: ToggleLikeToReplyInput,
+    @CurrentUser() user: User,
+  ): Promise<ToggleLikeToReplyOutput> {
+    return this.likeService.toggleLikeToReply(toggleLikeToReplyInput, user);
   }
 }
