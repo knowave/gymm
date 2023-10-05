@@ -131,31 +131,33 @@ export class LikeService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const gym = await this.replyRepository.findOne({ where: { id: gymId } });
+      const reply = await this.replyRepository.findOne({
+        where: { id: replyId },
+      });
       const like = await this.likeRepository.findOne({
-        relations: ['gym', 'user'],
-        where: { gym: { id: gymId }, user: { id: user.id } },
+        relations: ['reply', 'user'],
+        where: { gym: { id: replyId }, user: { id: user.id } },
       });
 
-      if (!gym) return { ok: false, error: '존재하는 Gym이 없습니다.' };
+      if (!reply) return { ok: false, error: '존재하는 댓글이 없습니다.' };
 
       if (!like) {
         const liked = queryRunner.manager.create(Like, {
-          gym: gym,
+          reply: reply,
           user: user,
         });
 
-        gym.likeCount++;
-        await queryRunner.manager.save(gym);
+        reply.likeCount++;
+        await queryRunner.manager.save(reply);
         await queryRunner.manager.save(liked);
         await queryRunner.commitTransaction();
-        return { ok: true, gymLike: true };
+        return { ok: true, replyLike: true };
       } else {
-        gym.likeCount--;
-        await queryRunner.manager.save(gym);
+        reply.likeCount--;
+        await queryRunner.manager.save(reply);
         await queryRunner.manager.softRemove(Like, like);
         await queryRunner.commitTransaction();
-        return { ok: true, gymLike: false };
+        return { ok: true, replyLike: false };
       }
     } catch (err) {
       await queryRunner.rollbackTransaction();
