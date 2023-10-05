@@ -14,6 +14,10 @@ export class Reply extends BaseEntity {
   @Column('text', { nullable: true })
   content?: string;
 
+  @Field(() => Number, { nullable: true })
+  @Column({ nullable: true })
+  likeCount?: number;
+
   @Field(() => Feed, { nullable: true })
   @ManyToOne(() => Feed, (feed) => feed.replies, {
     eager: true,
