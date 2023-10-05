@@ -13,6 +13,14 @@ import {
   WriteReplyByGymInput,
   WriteReplyByGymOutput,
 } from './dto/write-reply-by-gym.dto';
+import {
+  EditReplyByFeedInput,
+  EditReplyByFeedOutput,
+} from './dto/edit-reply-by-feed.dto';
+import {
+  EditReplyByGymInput,
+  EditReplyByGymOutput,
+} from './dto/edit-reply-by-gym.dto';
 
 @Injectable()
 export class ReplyService {
@@ -88,6 +96,70 @@ export class ReplyService {
       });
 
       await queryRunner.manager.save(writeReply);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async editReplyByFeed(
+    { feedId, replyId, content }: EditReplyByFeedInput,
+    user: User,
+  ): Promise<EditReplyByFeedOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const feed = await this.feedRepository.findOne({
+        where: { id: feedId },
+      });
+      const reply = await this.replyRepository.findOne({
+        relations: ['feed', 'user'],
+        where: { id: replyId, feed: { id: feedId }, user: { id: user.id } },
+      });
+
+      if (!feed) return { ok: false, error: '존재하는 Feed가 없습니다.' };
+      if (!reply) return { ok: false, error: '존재하는 댓글이 없습니다.' };
+
+      reply.content = content;
+
+      await queryRunner.manager.save(reply);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async editReplyByGym(
+    { gymId, replyId, content }: EditReplyByGymInput,
+    user: User,
+  ): Promise<EditReplyByGymOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const gym = await this.gymRepository.findOne({
+        where: { id: gymId },
+      });
+      const reply = await this.replyRepository.findOne({
+        relations: ['gym', 'user'],
+        where: { id: replyId, gym: { id: gymId }, user: { id: user.id } },
+      });
+
+      if (!gym) return { ok: false, error: '존재하는 Gym이 없습니다.' };
+      if (!reply) return { ok: false, error: '존재하는 댓글이 없습니다.' };
+
+      reply.content = content;
+
+      await queryRunner.manager.save(reply);
       await queryRunner.commitTransaction();
       return { ok: true };
     } catch (err) {
