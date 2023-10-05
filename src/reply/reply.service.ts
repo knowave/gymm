@@ -21,6 +21,7 @@ import {
   EditReplyByGymInput,
   EditReplyByGymOutput,
 } from './dto/edit-reply-by-gym.dto';
+import { DeleteReplyInput, DeleteReplyOutput } from './dto/delete-reply.dto';
 
 @Injectable()
 export class ReplyService {
@@ -160,6 +161,63 @@ export class ReplyService {
       reply.content = content;
 
       await queryRunner.manager.save(reply);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteReplyByFeed(
+    { replyId, feedId }: DeleteReplyInput,
+    user: User,
+  ): Promise<DeleteReplyOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const reply = await this.replyRepository.findOne({
+        relations: ['feed', 'user'],
+        where: { id: replyId, feed: { id: feedId }, user: { id: user.id } },
+      });
+
+      if (!reply) return { ok: false, error: '존재하는 댓글이 없습니다.' };
+
+      await queryRunner.manager.softRemove(Reply, reply);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteReplyByGym(
+    { replyId, gymId }: DeleteReplyInput,
+    user: User,
+  ): Promise<DeleteReplyOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const reply = await this.replyRepository.findOne({
+        relations: ['gym', 'user'],
+        where: {
+          id: replyId,
+          feed: { id: gymId },
+          user: { id: user.id },
+        },
+      });
+
+      if (!reply) return { ok: false, error: '존재하는 댓글이 없습니다.' };
+
+      await queryRunner.manager.softRemove(Reply, reply);
+      await queryRunner.commitTransaction();
       await queryRunner.commitTransaction();
       return { ok: true };
     } catch (err) {

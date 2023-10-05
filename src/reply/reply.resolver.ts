@@ -19,6 +19,7 @@ import {
   EditReplyByGymInput,
   EditReplyByGymOutput,
 } from './dto/edit-reply-by-gym.dto';
+import { DeleteReplyInput, DeleteReplyOutput } from './dto/delete-reply.dto';
 
 @Resolver(() => Reply)
 export class ReplyResolver {
@@ -54,5 +55,21 @@ export class ReplyResolver {
     @CurrentUser() user: User,
   ): Promise<EditReplyByGymOutput> {
     return this.replyService.editReplyByGym(writeReplyByGymInput, user);
+  }
+
+  @Mutation(() => DeleteReplyOutput)
+  async deleteReplyByFeed(
+    @Args('input') deleteReplyInput: DeleteReplyInput,
+    @CurrentUser() user: User,
+  ): Promise<DeleteReplyOutput> {
+    return this.replyService.deleteReplyByFeed(deleteReplyInput, user);
+  }
+
+  @Mutation(() => DeleteReplyOutput)
+  async deleteReplyByGym(
+    @Args('input') deleteReplyInput: DeleteReplyInput,
+    @CurrentUser() user: User,
+  ): Promise<DeleteReplyOutput> {
+    return this.replyService.deleteReplyByGym(deleteReplyInput, user);
   }
 }
