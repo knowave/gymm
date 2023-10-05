@@ -12,6 +12,7 @@ import { Gym } from 'src/gym/entities/gym.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
 import { Like } from 'src/like/entities/like.entity';
+import { Reply } from 'src/reply/entities/reply.entity';
 
 registerEnumType(UserRole, { name: 'UserRole' });
 
@@ -85,4 +86,13 @@ export class User extends BaseEntity {
     cascade: ['soft-remove'],
   })
   likes?: Like[];
+
+  @Field(() => [Reply], { nullable: true })
+  @OneToMany(() => Reply, (reply) => reply.user, {
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+    cascade: ['soft-remove'],
+  })
+  replies: Reply[];
 }
