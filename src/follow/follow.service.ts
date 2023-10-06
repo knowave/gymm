@@ -3,6 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FollowUserInput, FollowUserOutput } from './dto/follow-user.dto';
+import {
+  UnFollowUserInput,
+  UnFollowUserOutput,
+} from './dto/un-follow-user.dto';
 
 @Injectable()
 export class FollowService {
@@ -46,6 +50,56 @@ export class FollowService {
         // 팔오우를 하고 있지 않으면 팔로우
         currentUser.following.push(targetUser);
         targetUser.followers.push(currentUser);
+      }
+
+      await queryRunner.manager.save([currentUser, targetUser]);
+      await queryRunner.commitTransaction();
+      return { ok: true };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async unFollowUser(
+    { targetUserId }: UnFollowUserInput,
+    user: User,
+  ): Promise<UnFollowUserOutput> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const currentUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      const targetUser = await this.userRepository.findOne({
+        where: { id: targetUserId },
+      });
+
+      if (!currentUser)
+        return { ok: false, error: '존재하는 user가 없습니다.' };
+      if (!targetUser)
+        return {
+          ok: false,
+          error: 'Follow를 하고자 하는 user가 없습니다.',
+        };
+
+      const isFollowing = currentUser.following.some(
+        (u) => u.id !== targetUser.id,
+      );
+
+      if (isFollowing) {
+        // 팔로우 중이면 언파로우
+        currentUser.following = currentUser.following.filter(
+          (u) => u.id !== targetUser.id,
+        );
+        targetUser.followers = currentUser.followers.filter(
+          (u) => u.id !== currentUser.id,
+        );
+      } else {
+        return { ok: false, error: 'UnFollow를 하고자 하는 user가 없습니다.' };
       }
 
       await queryRunner.manager.save([currentUser, targetUser]);
