@@ -7,9 +7,8 @@ import {
 import { IsEmail, IsEnum, IsString, Length, Matches } from 'class-validator';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
-import { Follow } from 'src/follow/entities/follow.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
 import { Like } from 'src/like/entities/like.entity';
 import { Reply } from 'src/reply/entities/reply.entity';
@@ -69,14 +68,23 @@ export class User extends BaseEntity {
   })
   gyms?: Gym[];
 
-  @Field(() => [Follow], { nullable: true })
-  @OneToMany(() => Follow, (follow) => follow.user, {
+  @Field(() => [User], { nullable: true })
+  @ManyToMany(() => User, (user) => user.following, {
     eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
   })
-  follows?: Follow[];
+  followers?: User[];
+
+  @Field(() => [User], { nullable: true })
+  @ManyToMany(() => User, (user) => user.followers, {
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+    cascade: ['soft-remove'],
+  })
+  following?: User[];
 
   @Field(() => [Like], { nullable: true })
   @OneToMany(() => Like, (like) => like.user, {
