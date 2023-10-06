@@ -47,6 +47,7 @@ export class User extends BaseEntity {
   jwtToken?: string;
 
   @Field(() => UserRole, { defaultValue: UserRole.CLIENT })
+  @Column('enum', { enum: UserRole, default: UserRole.CLIENT })
   @IsEnum(UserRole)
   role: UserRole;
 

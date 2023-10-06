@@ -1,5 +1,4 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
-import { IsEnum } from 'class-validator';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
 import { Like } from 'src/like/entities/like.entity';
@@ -21,12 +20,10 @@ export class Feed extends BaseEntity {
   description?: string;
 
   @Field(() => FeedStatus, { defaultValue: FeedStatus.PUBLIC })
-  @Column({
+  @Column('enum', {
     enum: FeedStatus,
-    type: 'enum',
     default: FeedStatus.PUBLIC,
   })
-  @IsEnum(FeedStatus)
   status: FeedStatus;
 
   @Field(() => Number, { nullable: true })

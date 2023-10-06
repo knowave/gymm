@@ -24,12 +24,12 @@ export class UserResolver {
   }
 
   @Mutation(() => EditUserOutput)
-  updateUser(@Args('input') editUserInput: EditUserInput) {
+  async updateUser(@Args('input') editUserInput: EditUserInput) {
     return this.userService.editUser(editUserInput);
   }
 
   @Mutation(() => DeleteUserOutput)
-  removeUser(@Args('input') deleteUserInput: DeleteUserInput) {
+  async removeUser(@Args('input') deleteUserInput: DeleteUserInput) {
     return this.userService.deleteUser(deleteUserInput);
   }
 }
