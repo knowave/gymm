@@ -1,6 +1,5 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ReplyService } from './reply.service';
-import { Reply } from './entities/reply.entity';
 import {
   WriteReplyByFeedInput,
   WriteReplyByFeedOutput,
@@ -21,7 +20,7 @@ import {
 } from './dto/edit-reply-by-gym.dto';
 import { DeleteReplyInput, DeleteReplyOutput } from './dto/delete-reply.dto';
 
-@Resolver(() => Reply)
+@Resolver()
 export class ReplyResolver {
   constructor(private readonly replyService: ReplyService) {}
 

@@ -1,6 +1,5 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { LikeService } from './like.service';
-import { Like } from './entities/like.entity';
 import {
   ToggleLikeToGymInput,
   ToggleLikeToGymOutput,
@@ -16,7 +15,7 @@ import {
   ToggleLikeToReplyOutput,
 } from './dto/toggel-like-to-reply.dto';
 
-@Resolver(() => Like)
+@Resolver()
 export class LikeResolver {
   constructor(private readonly likeService: LikeService) {}
 
