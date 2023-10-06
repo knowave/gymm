@@ -24,10 +24,15 @@ export class Feed extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
-  @Column({ enum: FeedStatus, type: 'enum', default: FeedStatus.PUBLIC })
-  @Field(() => FeedStatus)
+  @Column({
+    enum: FeedStatus,
+    type: 'enum',
+    default: FeedStatus.PUBLIC,
+    nullable: true,
+  })
+  @Field(() => FeedStatus, { nullable: true })
   @IsEnum(FeedStatus)
-  status: FeedStatus;
+  status?: FeedStatus;
 
   @Field(() => Number, { nullable: true })
   @Column({ nullable: true })
