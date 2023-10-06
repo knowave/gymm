@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Feed, FeedStatus } from '../entities/feed.entity';
+import { FeedStatus } from '../entities/feed.entity';
 import { BaseOutput } from 'src/common/dto/base-output.dto';
 
 @InputType()
