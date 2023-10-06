@@ -40,7 +40,6 @@ export class Gym extends BaseEntity {
 
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.gyms, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -49,7 +48,6 @@ export class Gym extends BaseEntity {
 
   @Field(() => Feed, { nullable: true })
   @ManyToOne(() => Feed, (feed) => feed.gym, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -58,7 +56,6 @@ export class Gym extends BaseEntity {
 
   @Field(() => [Like], { nullable: true })
   @OneToMany(() => Like, (like) => like.gym, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -67,7 +64,6 @@ export class Gym extends BaseEntity {
 
   @Field(() => [Reply], { nullable: true })
   @OneToMany(() => Reply, (reply) => reply.gym, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],

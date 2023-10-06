@@ -20,7 +20,6 @@ export class Reply extends BaseEntity {
 
   @Field(() => Feed, { nullable: true })
   @ManyToOne(() => Feed, (feed) => feed.replies, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -29,7 +28,6 @@ export class Reply extends BaseEntity {
 
   @Field(() => Gym, { nullable: true })
   @ManyToOne(() => Gym, (gym) => gym.replies, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -38,7 +36,6 @@ export class Reply extends BaseEntity {
 
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.replies, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -47,7 +44,6 @@ export class Reply extends BaseEntity {
 
   @Field(() => [Like], { nullable: true })
   @OneToMany(() => Like, (like) => like.reply, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],

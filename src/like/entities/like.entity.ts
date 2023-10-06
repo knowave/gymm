@@ -12,7 +12,6 @@ import { Entity, ManyToOne } from 'typeorm';
 export class Like extends BaseEntity {
   @Field(() => Feed, { nullable: true })
   @ManyToOne(() => Feed, (feed) => feed.likes, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -21,7 +20,6 @@ export class Like extends BaseEntity {
 
   @Field(() => Gym, { nullable: true })
   @ManyToOne(() => Gym, (gym) => gym.likes, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -30,7 +28,6 @@ export class Like extends BaseEntity {
 
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.likes, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
@@ -39,7 +36,6 @@ export class Like extends BaseEntity {
 
   @Field(() => Reply, { nullable: true })
   @ManyToOne(() => Reply, (reply) => reply.likes, {
-    eager: true,
     nullable: true,
     onDelete: 'CASCADE',
     cascade: ['soft-remove'],
