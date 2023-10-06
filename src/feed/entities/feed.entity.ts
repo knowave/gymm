@@ -6,11 +6,7 @@ import { Like } from 'src/like/entities/like.entity';
 import { Reply } from 'src/reply/entities/reply.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-
-export enum FeedStatus {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE',
-}
+import { FeedStatus } from '../enums/feed-status.enum';
 
 @InputType('feedInputType', { isAbstract: true })
 @ObjectType()
@@ -24,15 +20,14 @@ export class Feed extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
+  @Field(() => FeedStatus, { defaultValue: FeedStatus.PUBLIC })
   @Column({
     enum: FeedStatus,
     type: 'enum',
     default: FeedStatus.PUBLIC,
-    nullable: true,
   })
-  @Field(() => FeedStatus, { nullable: true })
   @IsEnum(FeedStatus)
-  status?: FeedStatus;
+  status: FeedStatus;
 
   @Field(() => Number, { nullable: true })
   @Column({ nullable: true })

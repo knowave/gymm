@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { FeedStatus } from '../entities/feed.entity';
 import { BaseOutput } from 'src/common/dto/base-output.dto';
+import { FeedStatus } from '../enums/feed-status.enum';
 
 @InputType()
 export class EditFeedByUserInput {

@@ -1,5 +1,5 @@
 import { BadRequestException, PipeTransform } from '@nestjs/common';
-import { FeedStatus } from '../entities/feed.entity';
+import { FeedStatus } from '../enums/feed-status.enum';
 
 export class FeedStatusValidationPipe implements PipeTransform {
   readonly StatusOptions = [FeedStatus.PRIVATE, FeedStatus.PUBLIC];
