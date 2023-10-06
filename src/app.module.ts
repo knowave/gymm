@@ -4,7 +4,6 @@ import { DataBaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import GraphQLJson from 'graphql-type-json';
 import { Context } from 'apollo-server-core';
 import * as Joi from 'joi';
 import { FeedModule } from './feed/feed.module';
@@ -28,7 +27,6 @@ import { LikeModule } from './like/like.module';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      // resolvers: { JSON: GraphQLJson },
       playground: true,
       autoSchemaFile: true,
       installSubscriptionHandlers: true,

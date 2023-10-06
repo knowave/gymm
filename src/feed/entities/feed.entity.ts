@@ -1,4 +1,9 @@
-import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import {
+  ObjectType,
+  Field,
+  InputType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Gym } from 'src/gym/entities/gym.entity';
 import { Like } from 'src/like/entities/like.entity';
@@ -6,6 +11,8 @@ import { Reply } from 'src/reply/entities/reply.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { FeedStatus } from '../enums/feed-status.enum';
+
+registerEnumType(FeedStatus, { name: 'FeedStatus' });
 
 @InputType('feedInputType', { isAbstract: true })
 @ObjectType()

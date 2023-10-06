@@ -18,9 +18,10 @@ import { DataSource } from 'typeorm';
         entities: [__dirname + '../../**/entities/**.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*.ts'],
         subscribers: [__dirname + '/subscribers/*.ts'],
-        synchronize: false,
+        synchronize: true,
         migrationsRun: true,
         charset: 'utf8mb4_unicode_ci',
+        logging: true,
       }),
       dataSourceFactory: async (options) => {
         try {
