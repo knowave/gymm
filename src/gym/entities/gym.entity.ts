@@ -1,7 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
-import { Follow } from 'src/follow/entities/follow.entity';
 import { Like } from 'src/like/entities/like.entity';
 import { Reply } from 'src/reply/entities/reply.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -56,15 +55,6 @@ export class Gym extends BaseEntity {
     cascade: ['soft-remove'],
   })
   feeds?: Feed[];
-
-  @Field(() => [Follow], { nullable: true })
-  @OneToMany(() => Follow, (follow) => follow.gym, {
-    eager: true,
-    nullable: true,
-    onDelete: 'CASCADE',
-    cascade: ['soft-remove'],
-  })
-  follows?: Follow[];
 
   @Field(() => [Like], { nullable: true })
   @OneToMany(() => Like, (like) => like.gym, {
