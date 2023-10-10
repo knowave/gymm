@@ -51,6 +51,10 @@ export class ReplyService {
 
       if (!feed) return { ok: false, error: '존재하는 Feed가 없습니다.' };
 
+      if (!user) {
+        return { ok: false, error: '존재하는 user가 없습니다.' };
+      }
+
       if (!content)
         return { ok: false, error: '작성하고자 하는 댓글 내용을 적어주세요.' };
 

@@ -33,7 +33,7 @@ export class ReplyResolver {
   }
 
   @Mutation(() => WriteReplyByGymOutput)
-  async wirteReplyByGym(
+  async writeReplyByGym(
     @Args('input') writeReplyByGymInput: WriteReplyByGymInput,
     @CurrentUser() user: User,
   ): Promise<WriteReplyByGymOutput> {
