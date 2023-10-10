@@ -5,6 +5,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { createConnection } from 'mysql2';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { Feed } from 'src/feed/entities/feed.entity';
+import { WriteReplyByFeedInput } from './dto/write-reply-by-feed.dto';
+import { Gym } from 'src/gym/entities/gym.entity';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -16,7 +19,13 @@ type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 describe('ReplyService', () => {
   let replyService: ReplyService;
   let replyRepository: MockRepository<Reply>;
+  let feedRepository: MockRepository<Feed>;
+  let userRepository: MockRepository<User>;
+  let gymRepository: MockRepository<Gym>;
   let dataSource: DataSource;
+
+  let user: User;
+  let feed: Feed;
 
   const mockQueryRunner = {
     manager: {},
@@ -29,6 +38,9 @@ describe('ReplyService', () => {
   }
 
   beforeEach(async () => {
+    user = new User();
+    feed = new Feed();
+
     Object.assign(mockQueryRunner.manager, {
       create: jest.fn(),
       save: jest.fn(),
@@ -56,6 +68,18 @@ describe('ReplyService', () => {
           provide: getRepositoryToken(Reply),
           useValue: mockRepository(),
         },
+        {
+          provide: getRepositoryToken(Feed),
+          useValue: mockRepository(),
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockRepository(),
+        },
+        {
+          provide: getRepositoryToken(Gym),
+          useValue: mockRepository(),
+        },
       ],
     }).compile();
 
@@ -63,10 +87,43 @@ describe('ReplyService', () => {
     replyRepository = module.get<MockRepository<Reply>>(
       getRepositoryToken(Reply),
     );
-    dataSource = module.get<DataSource>(MockDataSource);
+    feedRepository = module.get<MockRepository<Feed>>(getRepositoryToken(Feed));
+    dataSource = module.get<DataSource>(DataSource);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('WriteReplyByFeed', () => {
+    it('현재 user가 존재하고, feed도 존재하면 reply 작성이 성공한다.', async () => {
+      user.id = 1;
+      feed.id = 1;
+
+      const mockWriteReply: WriteReplyByFeedInput = {
+        feedId: feed.id,
+        content: 'test',
+      };
+
+      feedRepository.findOne.mockResolvedValue(feed);
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      jest
+        .spyOn(queryRunner.manager, 'create')
+        .mockReturnValue([mockWriteReply]);
+      jest.spyOn(queryRunner.manager, 'save').mockResolvedValue(mockWriteReply);
+
+      const result = await replyService.writeReplyByFeed(mockWriteReply, user);
+
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(1);
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: true });
+    });
   });
 });
