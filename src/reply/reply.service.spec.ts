@@ -116,6 +116,8 @@ describe('ReplyService', () => {
 
       const result = await replyService.writeReplyByFeed(mockWriteReply, user);
 
+      expect(feedRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.create).toHaveBeenCalledTimes(1);
       expect(queryRunner.manager.save).toHaveBeenCalledTimes(1);
       expect(queryRunner.connect).toHaveBeenCalledTimes(1);
       expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
@@ -124,6 +126,37 @@ describe('ReplyService', () => {
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
 
       expect(result).toEqual({ ok: true });
+    });
+
+    it('feed는 존재하는데, user가 존재하지 않으면 reply 작성은 실패한다.', async () => {
+      feed.id = 2;
+
+      const mockWriteReply: WriteReplyByFeedInput = {
+        feedId: feed.id,
+        content: 'test',
+      };
+
+      feedRepository.findOne.mockResolvedValue(feed);
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      jest
+        .spyOn(queryRunner.manager, 'create')
+        .mockReturnValue([mockWriteReply]);
+      jest.spyOn(queryRunner.manager, 'save').mockResolvedValue(mockWriteReply);
+
+      const result = await replyService.writeReplyByFeed(mockWriteReply, null);
+
+      expect(feedRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.create).toHaveBeenCalledTimes(0);
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(0);
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: false, error: '존재하는 user가 없습니다.' });
     });
   });
 });
