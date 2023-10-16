@@ -8,6 +8,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Feed } from 'src/feed/entities/feed.entity';
 import { WriteReplyByFeedInput } from './dto/write-reply-by-feed.dto';
 import { Gym } from 'src/gym/entities/gym.entity';
+import { WriteReplyByGymInput } from './dto/write-reply-by-gym.dto';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -26,6 +27,7 @@ describe('ReplyService', () => {
 
   let user: User;
   let feed: Feed;
+  let gym: Gym;
 
   const mockQueryRunner = {
     manager: {},
@@ -40,6 +42,7 @@ describe('ReplyService', () => {
   beforeEach(async () => {
     user = new User();
     feed = new Feed();
+    gym = new Gym();
 
     Object.assign(mockQueryRunner.manager, {
       create: jest.fn(),
@@ -88,6 +91,7 @@ describe('ReplyService', () => {
       getRepositoryToken(Reply),
     );
     feedRepository = module.get<MockRepository<Feed>>(getRepositoryToken(Feed));
+    gymRepository = module.get<MockRepository<Gym>>(getRepositoryToken(Gym));
     dataSource = module.get<DataSource>(DataSource);
   });
 
@@ -157,6 +161,44 @@ describe('ReplyService', () => {
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
 
       expect(result).toEqual({ ok: false, error: '존재하는 user가 없습니다.' });
+    });
+  });
+
+  describe('writeReplyByGym', () => {
+    it('현재 user가 존재하고, gym이 존재한다면 gym에 댓글 작성이 성공한다.', async () => {
+      user.id = 1;
+      gym.id = 1;
+
+      const mockWriteReplyByGym: WriteReplyByGymInput = {
+        gymId: gym.id,
+        content: 'gymgymgym',
+      };
+
+      gymRepository.findOne.mockResolvedValue(gym);
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      jest
+        .spyOn(queryRunner.manager, 'create')
+        .mockReturnValue([mockWriteReplyByGym]);
+      jest
+        .spyOn(queryRunner.manager, 'save')
+        .mockResolvedValue(mockWriteReplyByGym);
+
+      const result = await replyService.writeReplyByGym(
+        mockWriteReplyByGym,
+        user,
+      );
+
+      expect(gymRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.create).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(1);
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
     });
   });
 });
