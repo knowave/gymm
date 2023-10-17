@@ -200,5 +200,39 @@ describe('ReplyService', () => {
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ ok: true });
     });
+
+    it('gym은 존재하는데, user가 존재하지 않으면 댓글 작성에 실패한다.', async () => {
+      gym.id = 100;
+
+      const mockWriteReplyByGym: WriteReplyByGymInput = {
+        gymId: gym.id,
+        content: 'fail test',
+      };
+
+      gymRepository.findOne.mockResolvedValue(gym);
+      const queryRunner = dataSource.createQueryRunner();
+
+      jest
+        .spyOn(queryRunner.manager, 'create')
+        .mockReturnValue([mockWriteReplyByGym]);
+      jest
+        .spyOn(queryRunner.manager, 'save')
+        .mockResolvedValue(mockWriteReplyByGym);
+
+      const result = await replyService.writeReplyByGym(
+        mockWriteReplyByGym,
+        null,
+      );
+
+      expect(gymRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.create).toHaveBeenCalledTimes(0);
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(0);
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: false, error: '존재하는 user가 없습니다.' });
+    });
   });
 });
