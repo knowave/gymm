@@ -32,7 +32,7 @@ export class GqlAuthGuard implements CanActivate {
       const gqlContext = GqlExecutionContext.create(context).getContext();
 
       const token = gqlContext.req
-        ? gqlContext.req.headers['authorization']
+        ? gqlContext.req.headers['Authorization']
         : gqlContext.token;
 
       if (token) {
