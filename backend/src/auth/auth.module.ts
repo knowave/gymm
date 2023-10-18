@@ -6,6 +6,9 @@ import { GqlAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DataSource } from 'typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -20,10 +23,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         },
       }),
     }),
+    TypeOrmModule.forFeature([User]),
   ],
   providers: [
     AuthService,
     AuthResolver,
+    DataSource,
     { provide: APP_GUARD, useClass: GqlAuthGuard },
   ],
   exports: [AuthService],
