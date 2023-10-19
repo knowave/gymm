@@ -9,6 +9,7 @@ import { Feed } from 'src/feed/entities/feed.entity';
 import { WriteReplyByFeedInput } from './dto/write-reply-by-feed.dto';
 import { Gym } from 'src/gym/entities/gym.entity';
 import { WriteReplyByGymInput } from './dto/write-reply-by-gym.dto';
+import { EditReplyByFeedInput } from './dto/edit-reply-by-feed.dto';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -28,6 +29,7 @@ describe('ReplyService', () => {
   let user: User;
   let feed: Feed;
   let gym: Gym;
+  let reply: Reply;
 
   const mockQueryRunner = {
     manager: {},
@@ -43,6 +45,7 @@ describe('ReplyService', () => {
     user = new User();
     feed = new Feed();
     gym = new Gym();
+    reply = new Reply();
 
     Object.assign(mockQueryRunner.manager, {
       create: jest.fn(),
@@ -233,6 +236,71 @@ describe('ReplyService', () => {
       expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
       expect(result).toEqual({ ok: false, error: '존재하는 user가 없습니다.' });
+    });
+
+    it('user가 존재하고, 해당 user가 feed에 댓글을 남겼다면 댓글 수정이 가능하다.', async () => {
+      user.id = 1;
+      feed.id = 1;
+      reply.id = 1;
+
+      const mockEditReply: EditReplyByFeedInput = {
+        feedId: feed.id,
+        replyId: reply.id,
+        content: 'Test By Reply',
+      };
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      feedRepository.findOne.mockResolvedValue(feed);
+      replyRepository.findOne.mockResolvedValue(reply);
+
+      jest.spyOn(queryRunner.manager, 'save').mockResolvedValue(mockEditReply);
+
+      const result = await replyService.editReplyByFeed(mockEditReply, user);
+
+      expect(feedRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(replyRepository.findOne).toHaveBeenCalledTimes(1);
+
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('user는 존재하는데, 해당 user가 feed에 댓글을 남기지 않았다면 댓글 수정이 실패한다.', async () => {
+      user.id = 1;
+      reply.id = 1;
+
+      const mockEditReply: EditReplyByFeedInput = {
+        feedId: null,
+        replyId: reply.id,
+        content: 'Test By Reply',
+      };
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      feedRepository.findOne.mockResolvedValue(null);
+      replyRepository.findOne.mockResolvedValue(reply);
+
+      jest.spyOn(queryRunner.manager, 'save').mockResolvedValue(mockEditReply);
+
+      const result = await replyService.editReplyByFeed(mockEditReply, user);
+
+      expect(feedRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(replyRepository.findOne).toHaveBeenCalledTimes(1);
+
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(0);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: false, error: '존재하는 Feed가 없습니다.' });
     });
   });
 });
