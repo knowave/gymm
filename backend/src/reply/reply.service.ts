@@ -226,7 +226,6 @@ export class ReplyService {
 
       await queryRunner.manager.softRemove(Reply, reply);
       await queryRunner.commitTransaction();
-      await queryRunner.commitTransaction();
       return { ok: true };
     } catch (err) {
       await queryRunner.rollbackTransaction();
