@@ -11,6 +11,7 @@ import { Gym } from 'src/gym/entities/gym.entity';
 import { WriteReplyByGymInput } from './dto/write-reply-by-gym.dto';
 import { EditReplyByFeedInput } from './dto/edit-reply-by-feed.dto';
 import { EditReplyByGymInput } from './dto/edit-reply-by-gym.dto';
+import { DeleteReplyInput } from './dto/delete-reply.dto';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -367,6 +368,144 @@ describe('ReplyService', () => {
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
 
       expect(result).toEqual({ ok: false, error: '존재하는 Gym이 없습니다.' });
+    });
+
+    it('해당 user가 feed에 댓글을 남겼을 경우 남긴 댓글을 삭제할 수 있다.', async () => {
+      user.id = 1;
+      feed.id = 1;
+      reply.id = 1;
+
+      const mockDeletedReply: DeleteReplyInput = {
+        replyId: reply.id,
+        feedId: feed.id,
+      };
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      replyRepository.findOne.mockResolvedValue(reply);
+
+      jest
+        .spyOn(queryRunner.manager, 'softRemove')
+        .mockResolvedValue(mockDeletedReply);
+
+      const result = await replyService.deleteReplyByFeed(
+        mockDeletedReply,
+        user,
+      );
+
+      expect(replyRepository.findOne).toHaveBeenCalledTimes(1);
+
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.softRemove).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('해당 user가 feed에 댓글을 남기지 않았을 경우 댓글 삭제는 실패한다.', async () => {
+      user.id = 1;
+      feed.id = 1;
+
+      const mockDeletedReply: DeleteReplyInput = {
+        replyId: null,
+        feedId: feed.id,
+      };
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      replyRepository.findOne.mockResolvedValue(null);
+
+      jest
+        .spyOn(queryRunner.manager, 'softRemove')
+        .mockResolvedValue(mockDeletedReply);
+
+      const result = await replyService.deleteReplyByFeed(
+        mockDeletedReply,
+        user,
+      );
+
+      expect(replyRepository.findOne).toHaveBeenCalledTimes(1);
+
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.softRemove).toHaveBeenCalledTimes(0);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: false, error: '존재하는 댓글이 없습니다.' });
+    });
+
+    it('해당 user가 gym에 댓글을 남겼을 경우 남긴 댓글을 삭제할 수 있다.', async () => {
+      user.id = 1;
+      gym.id = 1;
+      reply.id = 1;
+
+      const mockDeletedReply: DeleteReplyInput = {
+        replyId: reply.id,
+        gymId: gym.id,
+      };
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      replyRepository.findOne.mockResolvedValue(reply);
+
+      jest
+        .spyOn(queryRunner.manager, 'softRemove')
+        .mockResolvedValue(mockDeletedReply);
+
+      const result = await replyService.deleteReplyByGym(
+        mockDeletedReply,
+        user,
+      );
+
+      expect(replyRepository.findOne).toHaveBeenCalledTimes(1);
+
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.softRemove).toHaveBeenCalledTimes(1);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('해당 user가 gym에 댓글을 남기지 않았을 경우 댓글 삭제는 실패한다.', async () => {
+      user.id = 1;
+      gym.id = 1;
+
+      const mockDeletedReply: DeleteReplyInput = {
+        replyId: null,
+        gymId: gym.id,
+      };
+
+      const queryRunner = dataSource.createQueryRunner();
+
+      replyRepository.findOne.mockResolvedValue(null);
+
+      jest
+        .spyOn(queryRunner.manager, 'softRemove')
+        .mockResolvedValue(mockDeletedReply);
+
+      const result = await replyService.deleteReplyByGym(
+        mockDeletedReply,
+        user,
+      );
+
+      expect(replyRepository.findOne).toHaveBeenCalledTimes(1);
+
+      expect(queryRunner.connect).toHaveBeenCalledTimes(1);
+      expect(queryRunner.startTransaction).toHaveBeenCalledTimes(1);
+      expect(queryRunner.manager.softRemove).toHaveBeenCalledTimes(0);
+      expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(0);
+      expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({ ok: false, error: '존재하는 댓글이 없습니다.' });
     });
   });
 });
